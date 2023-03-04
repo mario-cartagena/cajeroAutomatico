@@ -83,50 +83,32 @@ const validarCredenciales = () => {
         }
 
         return usuarioEncontrado;
-
-            for (let i = 0; i < arrayUsers.length; i++) {
-                if (arrayUsers[i].documento == documento && arrayUsers[i].contrasena == password) {
-                usuarioEncontrado = true;
-                // console.log("Entraste");
-                if (arrayUsers[i].tipoUsuario === 1) {
-                    console.log("Bienvenido Administrador: " + arrayUsers[i].nombre);
-                    cargarCajero();
-                    //mostrarTotales();
-                } else {
-                    console.log("Bienvenido Cliente: " + arrayUsers[i].nombre);
-                }
-                break;
-                }
-            }
-
-            if (!usuarioEncontrado) {
-                console.log("Usuario no encontrado. Intente nuevamente.");
-            }
 };
 
 
 // 3. Solicitar la cantidad de billetes de 5, 10, 20, 50 y 100 mil pesos COP.
 const cargarCajero = () => {
-    alert("El administrador "+listaUsuarios.nombre+ "va a depositar dinero.");
+    alert("El administador va a depositar dinero");
     let totalDinero = 0;
 
     // 4. Almacenar esta información en un array de objetos.
     // Necesito recorrer el arreglo para solicitar la cantidad de billetes por denominación que el usuario desea.
     dineroCajero.forEach((billete) => {
         const cantidadBilletes = parseInt(prompt(`Por favor ingrese la cantidad de billetes de ${billete.denominacion} que necesitas depositar: `));
+        const cantitadEnteraDeBilletes = Number(cantidadBilletes);
 
         // Acumulo la cantidad de billetes por denominación.
-        billete.cantidad += cantidadBilletes;
+        billete.cantidad += cantitadEnteraDeBilletes;
         // Se hace el total por denominación ingresada.
-        const totalPorDenominacion = (billete.cantidad * billete.denominacion);
+        const totalPorDenominacion = (billete.denominacion * billete.cantidad);
         // Sumo el total de todas las denominaciones para hallar el total general que hay en el cajero.
         totalDinero += totalPorDenominacion;
-        //Se muestra la suma por cada denominación que hay en el cajero
-        console.log(`Hay ${totalPorDenominacion} billetes de ${billete.denominacion} pesos.`);
+        //Se muestra la cantidad total de dinero por denominación que hay en el cajero
+        console.log(`Hay ${totalDinero} en billetes de ${billete.denominacion} pesos.`);
     });
 
     // 5. Una vez tenga la información, debe mostrar en consola la suma por cada denominación y el total general.
-    console.log("El dinero que hay por denominación es: "+dineroCajero);
+    console.log("El dinero que hay por denominación es: ", dineroCajero);
     console.log("El total del dinero que actualmente hay en el cajero es de: "+totalDinero);
 };
 
@@ -137,71 +119,86 @@ const cargarCajero = () => {
 // consola: “Cajero en mantenimiento, vuelva pronto.” Y reiniciar desde el 
 // inicio.
 
-const retirarDinero = () =>{
+const retirarDinero = (arrayDineroCajero) => {
+
+    let totalDineroCajero = 0;
+    arrayDineroCajero.forEach((billete) => {
+        totalDineroCajero += billete.denominacion * billete.cantidad;
+    });
+
+    console.log("Total de dinero que tiene el cajero: "+totalDineroCajero);
+
     const cantidadARetirarStr = prompt("Ingresa la cantidad de dinero que deseas retirar: ");
     const cantidadARetirar = Number(cantidadARetirarStr);
+
+    const diferencia = totalDineroCajero - cantidadARetirar;
+    console.log("Diferencia: ", diferencia);
+
+    if(diferencia < 0){
+        return {
+            mensaje: "El cajero no tiene suficiente dinero para darle al cliente",
+            devuelta: [],
+        };
+    } else if(diferencia === 0){
+        return {
+            mensaje: "",
+            devuelta: [],
+        };
+    } else if(diferencia > 0){
+        const arrayDevueltas = [];
+        let devueltas = diferencia;
+
+        // Cuando el cajero tiene suficiente sencillo para entregarle al cliente la cantidad total del retiro.
+        dineroCajero.forEach((billete) => {
+            const billetesADevolver = Math.floor(devueltas / billete.denominacion);
+            if(billetesADevolver > 0){
+                if(billetesADevolver <= billete.cantidad){
+                    const billetes = {
+                        denominacion: billete.denominacion,
+                        cantidad: billetesADevolver,
+                    };
+                    arrayDevueltas.push(billetes);
+                    billete.cantidad -= billetesADevolver;
+                    devueltas -= billete.denominacion * billetesADevolver;
+                } else{
+                    const billetes = {
+                        denominacion: billete.denominacion,
+                        cantidad: billete.cantidad,
+                    };
+                    arrayDevueltas.push(billetes);
+                    devueltas -= billete.denominacion * billetes.cantidad;
+                    billete.cantidad = billete.cantidad > 0 ? 0 : 0;
+                }
+            }
+        });
+
+        // Cuando en el cajero no hay sencillo.
+        if(devueltas){
+            return {
+                mensaje: "El cajero no tiene suficiente sencillo para completar el cambio.",
+                devuelta: arrayDevueltas
+            };
+        } else {
+            return {
+                mensaje: "COMPLETADO",
+                devuelta: arrayDevueltas
+            };
+        }
+    }
 };
 
+const iniciarCajero = () =>{
+    const usuarioEncontrado = validarCredenciales();
+    if(usuarioEncontrado){
+        // Acción que puede realizar el administrador
+        if(usuarioEncontrado.tipoUsuario === 1){
+            cargarCajero();
+        } else {
+            // Acción que puede realizar el cliente
+            retirarDinero(dineroCajero);
+        }
+    }
+};
 
-// function cargarCajero (){
-
-//     let cajero = {
-//         billetes5: 0,
-//         billetes10: 0,
-//         billetes20: 0,
-//         billetes50: 0,
-//         billetes100: 0
-//     };
-
-//     cajero.billetes5 = parseInt(prompt("Ingrese cantidad de billetes de 5 mil pesos"));
-//     cajero.billetes10 = parseInt(prompt("Ingrese cantidad de billetes de 10 mil pesos"));
-//     cajero.billetes20 = parseInt(prompt("Ingrese cantidad de billetes de 20 mil pesos"));
-//     cajero.billetes50 = parseInt(prompt("Ingrese cantidad de billetes de 50 mil pesos"));
-//     cajero.billetes100 = parseInt(prompt("Ingrese cantidad de billetes de 100 mil pesos"));
-
-//     console.log("Cajero cargado correctamente:");
-//     console.log(cajero);
-
-//     let total5 = cajero.billetes5 * 5000;
-//     let total10 = cajero.billetes10 * 10000;
-//     let total20 = cajero.billetes20 * 20000;
-//     let total50 = cajero.billetes50 * 50000;
-//     let total100 = cajero.billetes100 * 100000;
-//     let totalGeneral = total5 + total10 + total20 + total50 + total100;
-
-//     console.log(`Total de billetes de 5 mil pesos: ${cajero.billetes5} (total: ${total5})`);
-//     console.log(`Total de billetes de 10 mil pesos: ${cajero.billetes10} (total: ${total10})`);
-//     console.log(`Total de billetes de 20 mil pesos: ${cajero.billetes20} (total: ${total20})`);
-//     console.log(`Total de billetes de 50 mil pesos: ${cajero.billetes50} (total: ${total50})`);
-//     console.log(`Total de billetes de 100 mil pesos: ${cajero.billetes100} (total: ${total100})`);
-//     console.log(`Total general: ${totalGeneral}`);
-
-// }
-
-// if(arrayUsers[i].tipoUsuario === documento && arrayUsers[i].contrasena === pasword){
-
-// }else{
-//     alert("¡El usuario no existe!");
-//     // Volver a preguntar credenciales
-// }
-
-// const arrayBilletes = [
-//   {
-//     denominacion: 5000,
-//     cantidad: 3,
-//     tipo: [1, 2],
-//   },
-//   {
-//     denominacion: 10000,
-//     cantidad: 4,
-//     tipo: [1, 2],
-//   },
-//   {
-//     denominacion: 2000,
-//     cantidad: 2,
-//     tipo: [1, 2],
-//   },
-// ];
-
-// const billete10mil = arrayBilletes.find((item) => item.denominacion == 10000);
-// console.log("Billetes de 10 mil: ", billete10mil);
+// Se lanza el cajero
+iniciarCajero();
