@@ -55,54 +55,93 @@ const dineroCajero = [
 // // preguntar usuario y contraseña, si el usuario es administrador, debe
 // // permitir cargar el cajero de la siguiente manera:
 
-const cajeroIniciado = () => {
-  const documento = prompt("Ingrese su documento");
-  const constrasena = prompt("Ingrese su contraseña");
+const loginCajero = () => {
+  const documento = prompt("Ingresa tu número de documento: ");
+  const contrasena = prompt("Ingresa tu contraseña: ");
   return {
     documento,
-    constrasena
+    contrasena
   };
 };
 
 const validarCredenciales = () => {
-    let sesionIniciada = cajeroIniciado();
+    // Esta variable me guarda los datos de la sesión con la que el usuario se auntenticó.
+    let sesionIniciada = loginCajero();
 
-    let usuarioEncontrado = listaUsuarios.find((usuario) => {
-        usuario.documento
-    });
+    // Se realiza la validación
+    let usuarioEncontrado = listaUsuarios.find((usuario) => 
+        usuario.documento === sesionIniciada.documento && usuario.contrasena === sesionIniciada.contrasena
+    );
+
+        while (!usuarioEncontrado) {
+            alert("Error: ¡El usuario ingresado no existe!");
+            sesionIniciada = loginCajero();
+
+            usuarioEncontrado = listaUsuarios.find((usuario) => 
+                usuario.documento === sesionIniciada.documento && usuario.contrasena === sesionIniciada.contrasena
+            );
+        }
+
+        return usuarioEncontrado;
+
+            for (let i = 0; i < arrayUsers.length; i++) {
+                if (arrayUsers[i].documento == documento && arrayUsers[i].contrasena == password) {
+                usuarioEncontrado = true;
+                // console.log("Entraste");
+                if (arrayUsers[i].tipoUsuario === 1) {
+                    console.log("Bienvenido Administrador: " + arrayUsers[i].nombre);
+                    cargarCajero();
+                    //mostrarTotales();
+                } else {
+                    console.log("Bienvenido Cliente: " + arrayUsers[i].nombre);
+                }
+                break;
+                }
+            }
+
+            if (!usuarioEncontrado) {
+                console.log("Usuario no encontrado. Intente nuevamente.");
+            }
 };
 
-  
-// // 3. Solicitar la cantidad de billetes de 5, 10, 20, 50 y 100 mil pesos COP.
-// // 4. Almacenar esta información en un array de objetos.
-// // 5. Una vez tenga la información, debe mostrar en consola la suma por cada
-// // denominación y el total general.
 
-// let usuarioEncontrado = false;
+// 3. Solicitar la cantidad de billetes de 5, 10, 20, 50 y 100 mil pesos COP.
+const cargarCajero = () => {
+    alert("El administrador "+listaUsuarios.nombre+ "va a depositar dinero.");
+    let totalDinero = 0;
 
-// while (!usuarioEncontrado) {
-//   let documento = prompt("Ingrese su documento");
-//   let password = prompt("Ingrese su contraseña");
+    // 4. Almacenar esta información en un array de objetos.
+    // Necesito recorrer el arreglo para solicitar la cantidad de billetes por denominación que el usuario desea.
+    dineroCajero.forEach((billete) => {
+        const cantidadBilletes = parseInt(prompt(`Por favor ingrese la cantidad de billetes de ${billete.denominacion} que necesitas depositar: `));
 
-//   for (let i = 0; i < arrayUsers.length; i++) {
-//     if (arrayUsers[i].documento == documento && arrayUsers[i].contrasena == password) {
-//       usuarioEncontrado = true;
-//       // console.log("Entraste");
-//       if (arrayUsers[i].tipoUsuario === 1) {
-//         console.log("Bienvenido Administrador: " + arrayUsers[i].nombre);
-//         cargarCajero();
-//         //mostrarTotales();
-//       } else {
-//         console.log("Bienvenido Cliente: " + arrayUsers[i].nombre);
-//       }
-//       break;
-//     }
-//   }
+        // Acumulo la cantidad de billetes por denominación.
+        billete.cantidad += cantidadBilletes;
+        // Se hace el total por denominación ingresada.
+        const totalPorDenominacion = (billete.cantidad * billete.denominacion);
+        // Sumo el total de todas las denominaciones para hallar el total general que hay en el cajero.
+        totalDinero += totalPorDenominacion;
+        //Se muestra la suma por cada denominación que hay en el cajero
+        console.log(`Hay ${totalPorDenominacion} billetes de ${billete.denominacion} pesos.`);
+    });
 
-//   if (!usuarioEncontrado) {
-//     console.log("Usuario no encontrado. Intente nuevamente.");
-//   }
-// }
+    // 5. Una vez tenga la información, debe mostrar en consola la suma por cada denominación y el total general.
+    console.log("El dinero que hay por denominación es: "+dineroCajero);
+    console.log("El total del dinero que actualmente hay en el cajero es de: "+totalDinero);
+};
+
+// 6. Una vez el cajero esté cargado, debe volver a solicitar usuario y 
+// contraseña, si es administrador, se repite el mismo proceso, sumar a la 
+// cantidad actual, si es cliente debe proseguir de la siguiente manera:
+// 7. Si el cajero no tiene dinero cargado, debe aparecer un mensaje en 
+// consola: “Cajero en mantenimiento, vuelva pronto.” Y reiniciar desde el 
+// inicio.
+
+const retirarDinero = () =>{
+    const cantidadARetirarStr = prompt("Ingresa la cantidad de dinero que deseas retirar: ");
+    const cantidadARetirar = Number(cantidadARetirarStr);
+};
+
 
 // function cargarCajero (){
 
@@ -146,23 +185,23 @@ const validarCredenciales = () => {
 //     // Volver a preguntar credenciales
 // }
 
-const arrayBilletes = [
-  {
-    denominacion: 5000,
-    cantidad: 3,
-    tipo: [1, 2],
-  },
-  {
-    denominacion: 10000,
-    cantidad: 4,
-    tipo: [1, 2],
-  },
-  {
-    denominacion: 2000,
-    cantidad: 2,
-    tipo: [1, 2],
-  },
-];
+// const arrayBilletes = [
+//   {
+//     denominacion: 5000,
+//     cantidad: 3,
+//     tipo: [1, 2],
+//   },
+//   {
+//     denominacion: 10000,
+//     cantidad: 4,
+//     tipo: [1, 2],
+//   },
+//   {
+//     denominacion: 2000,
+//     cantidad: 2,
+//     tipo: [1, 2],
+//   },
+// ];
 
-const billete10mil = arrayBilletes.find((item) => item.denominacion == 10000);
-console.log("Billetes de 10 mil: ", billete10mil);
+// const billete10mil = arrayBilletes.find((item) => item.denominacion == 10000);
+// console.log("Billetes de 10 mil: ", billete10mil);
