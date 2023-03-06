@@ -115,7 +115,9 @@ const cargarCajero = () => {
   });
 
   // 5. Una vez tenga la información, debe mostrar en consola la suma por cada denominación y el total general.
-  console.log("El total del dinero que actualmente hay en el cajero es de: " +totalDinero);
+  console.log(
+    "El total del dinero que actualmente hay en el cajero es de: " + totalDinero
+  );
 
   /* 6. Una vez el cajero esté cargado, debe volver a solicitar usuario y
     contraseña, si es administrador, se repite el mismo proceso, sumar a la
@@ -123,61 +125,77 @@ const cargarCajero = () => {
   iniciarCajero();
 };
 
-
 const retirarDinero = () => {
   let totalDineroCajero = 0;
   dineroCajero.forEach((billete) => {
-    totalDineroCajero +=  billete.denominacion * billete.cantidad;
+    totalDineroCajero += billete.denominacion * billete.cantidad;
   });
 
-  console.log("Total de dinero que tiene el cajero: " +totalDineroCajero);
+  console.log("Total de dinero que tiene el cajero: " + totalDineroCajero);
 
-  if(totalDineroCajero === 0){
+  if (totalDineroCajero === 0) {
     /* 7. Si el cajero no tiene dinero cargado, debe aparecer un mensaje en consola: 
    “Cajero en mantenimiento, vuelva pronto.” Y reiniciar desde el inicio. */
     console.log("Cajero en mantenimiento, vuelva pronto.");
     iniciarCajero();
   } else if (totalDineroCajero > 0) {
-     /* 8. Si el cajero ya tiene dinero cargado, debe preguntar la cantidad deseada
+    /* 8. Si el cajero ya tiene dinero cargado, debe preguntar la cantidad deseada
       a retirar. Una vez obtenida la información, debe indicar cuánto dinero
       puede entregar basado en la cantidad disponible y los tipos de billetes.
       Luego debe mostrar en consola cuántos billetes de cada denominación
       entregó. Priorizando siempre las denominaciones más altas para valores
       altos y redondeando a la cifra más cercana menor a la solicitada. */
 
-    let cantidadARetirarStr = prompt("Ingresa la cantidad de dinero que deseas retirar: ");
+    let cantidadARetirarStr = prompt(
+      "Ingresa la cantidad de dinero que deseas retirar: "
+    );
     let cantidadARetirar = Number(cantidadARetirarStr);
+    console.log(
+      "La cantidad que el cliente quiere retirar es: " + cantidadARetirar
+    );
+
     if (cantidadARetirar <= totalDineroCajero) {
       let cantidadAEntregar = 0;
-      dineroCajero.forEach((billete)=>{
-        const billetesNecesarios = Math.floor(cantidadARetirar / billete.denominacion);
-        if(billetesNecesarios <= billete.cantidad){
-          if(cantidadARetirar >= billete.denominacion * billetesNecesarios){
+      const arrayDeLasVueltas = [];
+      dineroCajero.forEach((billete) => {
+        const billetesNecesarios = Math.floor(
+          cantidadARetirar / billete.denominacion
+        );
+        if (billetesNecesarios > 0) {
+          if (billetesNecesarios <= billete.cantidad) {
+            const billetes = {
+              denominacion: billete.denominacion,
+              cantidad: billetesNecesarios,
+            };
+            arrayDeLasVueltas.push(billetes);
+            //vueltas
             cantidadARetirar -= billete.denominacion * billetesNecesarios;
             billete.cantidad -= billetesNecesarios;
-            cantidadAEntregar += billete.denominacion * billetesNecesarios;
-            console.log(`Se entregaron ${billetesNecesarios} de ${billete.denominacion} pesos.`);
-          }
-        } else if(billetesNecesarios > billete.cantidad){
-          // Le entrego los billetes que yo tengo en mi cajero
-          if(cantidadARetirar >= billete.denominacion * billete.cantidad){
-            cantidadARetirar -= billete.denominacion - billete.cantidad;
-            billete.cantidad -= billete.cantidad;
-            cantidadAEntregar += billete.denominacion * billete.cantidad;
-            console.log(`Se entregaron ${billete.cantidad} de ${billete.denominacion} pesos.`);
+          } else {
+            const billetes = {
+              denominacion: billete.denominacion,
+              cantidad: billete.cantidad,
+            };
+            arrayDeLasVueltas.push(billetes);
+            cantidadARetirar -= billete.denominacion * billetes.cantidad;
+            billete.cantidad = billete.cantidad > 0 ? 0 : 0;
           }
         }
-      });
-      console.log(`El cajero entregó: ${cantidadAEntregar}`);
 
-      let dineroDisponible = 0;
-      dineroCajero.forEach((billete)=> {
         const totalPorDenominacion = billete.denominacion * billete.cantidad;
         console.log(`La suma de billetes de ${billete.denominacion} restante es: ${totalPorDenominacion} 
         y la cantidad restante de billetes es: ${billete.cantidad}`);
-        dineroDisponible += totalPorDenominacion;
       });
-      iniciarCajero();
+      console.log(dineroCajero);
+      if (cantidadARetirar) {
+        return {
+          dineroAEntregar: arrayDeLasVueltas,
+        };
+      } else {
+        return {
+          dineroAEntregar: arrayDeLasVueltas,
+        };
+      }
     } else if (cantidadARetirar > totalDineroCajero) {
       alert("El cajero no tiene suficiente dinero para entregarle al cliente.");
       iniciarCajero();
@@ -201,5 +219,3 @@ const iniciarCajero = () => {
 
 // Se lanza el cajero
 iniciarCajero();
-
- 
