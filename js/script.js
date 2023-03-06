@@ -150,7 +150,6 @@ const retirarDinero = () => {
     console.log("La cantidad que el cliente quiere retirar es: " +cantidadARetirar);
 
     if (cantidadARetirar <= totalDineroCajero) {
-      // let cantidadAEntregar = 0;
       const arrayDeLasVueltas = [];
       dineroCajero.forEach((billete)=>{
         const billetesNecesarios = Math.floor(cantidadARetirar / billete.denominacion);
@@ -171,7 +170,7 @@ const retirarDinero = () => {
             };
             arrayDeLasVueltas.push(billetes);
             cantidadARetirar -= billete.denominacion * billetes.cantidad;
-            billete.cantidad = billete.cantidad > 0 ? 0 : 0;
+            billete.cantidad = billete.cantidad > 0 ? 0 : 0; // billete.cantidad -= billete.cantidad; Usar el confirme para el bucle
           }
         }
       });
